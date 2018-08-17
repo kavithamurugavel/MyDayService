@@ -7,22 +7,24 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MyDayService.Models;
+using MyDayService.Models.News;
 using Newtonsoft.Json;
 
 namespace MyDayService.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Weather")]
-    public class WeatherController : Controller
+    [Route("api/News")]
+    public class NewsController : Controller
     {
-        // GET: api/Weather
+        // GET: api/News
         [HttpGet]
-        public WeatherRoot GetWeather(string zip)
+        public NewsRoot GetNews(string topic)
         {
             string jsonString = "";
-            string apiEndPoint = "http://api.openweathermap.org/data/2.5/weather?zip={0}&APPID={1}";
-            string formattedAPI = string.Format(apiEndPoint, zip, "*******"); // TODO: hiding API key until encryption is coded
+            string formattedDate = DateTime.Now.Date.ToString("yyyy-MM-dd");
+            string apiKey = "*******"; // TODO: hiding API key until encryption is coded
+            string apiEndPoint = "https://newsapi.org/v2/everything?q={0}&from={1}&to={1}&sortBy=popularity&apiKey={2}";
+            string formattedAPI = string.Format(apiEndPoint, topic, formattedDate, apiKey); 
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(string.Format(formattedAPI));
             webRequest.Method = "GET";
             HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponseAsync().Result;
@@ -33,25 +35,25 @@ namespace MyDayService.Controllers
                 jsonString = reader.ReadToEnd();
             }
 
-            var weather = JsonConvert.DeserializeObject<WeatherRoot>(jsonString);
-            return weather;
+            var news = JsonConvert.DeserializeObject<NewsRoot>(jsonString);
+            return news;
         }
 
         // Commenting for now since it was throwing exception. TODO: fix this
-        // GET: api/Weather/5
+        // GET: api/News/5
         //[HttpGet("{id}", Name = "Get")]
         //public string Get(int id)
         //{
         //    return "value";
         //}
 
-        // POST: api/Weather
+        // POST: api/News
         [HttpPost]
         public void Post([FromBody]string value)
         {
         }
         
-        // PUT: api/Weather/5
+        // PUT: api/News/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]string value)
         {
